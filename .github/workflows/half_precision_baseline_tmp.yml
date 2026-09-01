@@ -1,7 +1,9 @@
 name: Temporary half-precision baseline
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - codex/half-precision-baseline-run
 
 permissions:
   contents: read
