@@ -44,6 +44,8 @@ test-f64 = { cmd = "uv run pytest -v tests/", env = { KORNIA_TEST_DTYPE = "float
 test-slow = { cmd = "uv run pytest -v tests/", env = { KORNIA_TEST_RUNSLOW = "true" } }
 test-quick = { cmd = "uv run pytest -v -m 'not (jit or grad or nn)' tests/" }
 test-half = { cmd = "uv run pytest -v tests/", env = { KORNIA_TEST_DTYPE = "float16,bfloat16" }, description = "Run CPU half-precision tests" }
+test-half-ratchet = { cmd = "uv run python -m testing.half_precision", description = "Run CPU half-precision tests and reject new failures" }
+test-half-baseline = { cmd = "uv run python -m testing.half_precision --write-baseline", description = "Regenerate the reviewed CPU half-precision failure baseline" }
 test-module = { cmd = "uv run pytest -v", description = "Run tests for a specific module (usage: pixi run test-module tests/<module_path>, e.g., pixi run test-module tests/contrib/)" }
 # Quality
 lint = { cmd = "uv run pre-commit run ruff-check --all-files && uv run pre-commit run ruff-format --all-files" }

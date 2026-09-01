@@ -82,7 +82,7 @@ Leverage pre-trained AI models optimized for a variety of vision tasks, all with
 | `kornia.color` | ⚠️ | ⚠️ | Most conversions work for both; FFT-based ops may fail |
 | `kornia.filters` | ⚠️ | ⚠️ | Basic filters work; FFT-based ops may fail on CUDA |
 | `kornia.enhance` | ⚠️ | ⚠️ | Histogram eq / gamma / ZCA work (linalg ops use cast helpers) |
-| `kornia.morphology` | ✅ | ✅ | Conv/pool ops; `top_hat` / `bottom_hat` / `gradient` also subtract two dilation/erosion results, so bfloat16 loses ~0.4% relative accuracy — within kornia's own bfloat16 tolerance, though 6 tests override it with a tighter one ([#4081](https://github.com/kornia/kornia/issues/4081)) |
+| `kornia.morphology` | ✅ | ✅ | Conv/pool ops; `top_hat` / `bottom_hat` / `gradient` also subtract two dilation/erosion results, so bfloat16 loses ~0.4% relative accuracy. The morphology tests now use the dtype-aware tolerance from the shared harness ([#4081](https://github.com/kornia/kornia/issues/4081), fixed by [#4088](https://github.com/kornia/kornia/pull/4088)) |
 | `kornia.augmentation` | ⚠️ | ⚠️ | Most ops work; precision-sensitive transforms may be inaccurate |
 | `kornia.geometry.transform` | ⚠️ | ⚠️ | Affine/warp/resize work via cast helpers; thin-plate spline may fail |
 | `kornia.geometry.camera` | ⚠️ | ⚠️ | Pinhole model and most camera ops work; `StereoCamera` accepts both |
@@ -111,9 +111,13 @@ Leverage pre-trained AI models optimized for a variety of vision tasks, all with
 | CUDA bfloat16 *(KORNIA_TEST_IN_SUBPROCESS=1)* | 6695 | 713 | 3518 | **90.4%** | `6131e98`, 2026-03-21 |
 
 Reproduce the two CPU half rows with `pixi run test-half` and the CPU float32 baseline with `pixi run test-f32`
-(`test-half` pins `KORNIA_TEST_DTYPE` to `float16,bfloat16`, so it cannot produce the baseline). The half-precision
-suite is not run in CI (see [#4070](https://github.com/kornia/kornia/issues/4070)), so these numbers are refreshed
-by hand.
+(`test-half` pins `KORNIA_TEST_DTYPE` to `float16,bfloat16`, so it cannot produce the baseline). The ✅ morphology
+row is checked on every pull request. The remaining half-precision suite runs nightly with
+`pixi run test-half-ratchet` on Ubuntu (Python 3.11, PyTorch 2.9.1); its reviewed failure list is stored in
+[`tests/half_precision_known_failures.txt`](tests/half_precision_known_failures.txt), so a new failure is visible
+without turning the known partial-support failures into a permanent PR gate. The ratchet runs each test directory in a
+fresh process and retries a resource-terminated directory at file granularity. To refresh that list deliberately, run
+the same command in that CI environment (`pixi run test-half-baseline`) and explain any additions in the pull request.
 
 See the [full precision guide](https://kornia.readthedocs.io/en/stable/get-started/precision.html) for details.
 

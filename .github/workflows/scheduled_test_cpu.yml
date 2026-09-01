@@ -242,3 +242,15 @@ jobs:
       cache-restore-keys: |
         model-weights-${{ needs.pre-tests.outputs.hash }}
         model-weights-
+
+  # Partial-support modules are tracked by the reviewed failure baseline. This
+  # job deliberately stays out of the per-PR matrix: existing upstream PyTorch
+  # gaps remain visible without making every pull request permanently red.
+  half-precision-ratchet:
+    uses: ./.github/workflows/tests.yml
+    with:
+      os: ubuntu-latest
+      python-version: '["3.11"]'
+      pytorch-version: '["2.9.1"]'
+      pytorch-dtype: float16,bfloat16
+      half-precision-ratchet: true

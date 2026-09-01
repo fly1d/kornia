@@ -33,9 +33,10 @@ This page documents which kornia modules support half-precision floating-point d
      - ✅ Yes
      - Convolution and pooling; ``top_hat``, ``bottom_hat`` and ``gradient``
        also subtract two dilation/erosion results, so bfloat16 loses roughly
-       0.4% relative accuracy on them. That is within kornia's own bfloat16
-       tolerance, but six tests override it with a tighter constant and fail;
-       see `issue #4081 <https://github.com/kornia/kornia/issues/4081>`_.
+       0.4% relative accuracy on them. The morphology tests use kornia's
+       dtype-aware tolerance; the six hard-coded overrides tracked in
+       `issue #4081 <https://github.com/kornia/kornia/issues/4081>`_ were removed
+       by `PR #4088 <https://github.com/kornia/kornia/pull/4088>`_.
    * - ``kornia.augmentation``
      - ⚠️ Partial
      - ⚠️ Partial
@@ -119,10 +120,15 @@ Full test suite (no ``--runslow``). Pass% = passed ÷ (passed + failed);
 skipped and xfailed tests are excluded. CPU rows were measured on commit
 ``4ab79c78`` (2026-08-29); CUDA rows are still from ``6131e98`` (2026-03-21).
 
-The half-precision suite is not run in CI (see `issue #4070
-<https://github.com/kornia/kornia/issues/4070>`_), so these numbers are refreshed by hand: the two CPU half rows
-with ``pixi run test-half``, and the CPU float32 baseline with ``pixi run test-f32``, since ``test-half`` pins
-``KORNIA_TEST_DTYPE`` to ``float16,bfloat16``.
+The ✅ ``kornia.morphology`` row is checked on every pull request. The remaining half-precision suite runs nightly
+with ``pixi run test-half-ratchet`` (see `issue #4070
+<https://github.com/kornia/kornia/issues/4070>`_). It compares the observed node IDs with the reviewed
+``tests/half_precision_known_failures.txt`` baseline (Ubuntu, Python 3.11, PyTorch 2.9.1), so a new failure is
+reported without turning the existing partial-support failures into a permanent PR gate. Reproduce the two CPU half
+rows with ``pixi run test-half`` and the CPU float32 baseline with ``pixi run test-f32``; to refresh the baseline
+deliberately, run ``pixi run test-half-baseline`` in that same CI environment. Each test directory runs in a fresh
+process, with resource-terminated directories retried at file granularity. Explain any baseline additions in the pull
+request.
 
 .. list-table::
    :header-rows: 1
