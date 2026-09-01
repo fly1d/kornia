@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+* Check the supported ``kornia.morphology`` half-precision row on every pull request and add a nightly ratchet for
+  the documented partial-support modules. The ratchet compares test node IDs with a reviewed baseline, reports newly
+  failing tests, and lists tests that have started passing so the baseline can be tightened deliberately (#4070).
+
 ### Breaking changes
 
 * The shape guards of `normalize_homography` and `denormalize_homography` now reject everything but a

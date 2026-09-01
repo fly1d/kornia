@@ -111,9 +111,12 @@ Leverage pre-trained AI models optimized for a variety of vision tasks, all with
 | CUDA bfloat16 *(KORNIA_TEST_IN_SUBPROCESS=1)* | 6695 | 713 | 3518 | **90.4%** | `6131e98`, 2026-03-21 |
 
 Reproduce the two CPU half rows with `pixi run test-half` and the CPU float32 baseline with `pixi run test-f32`
-(`test-half` pins `KORNIA_TEST_DTYPE` to `float16,bfloat16`, so it cannot produce the baseline). The half-precision
-suite is not run in CI (see [#4070](https://github.com/kornia/kornia/issues/4070)), so these numbers are refreshed
-by hand.
+(`test-half` pins `KORNIA_TEST_DTYPE` to `float16,bfloat16`, so it cannot produce the baseline). The ✅ morphology
+row is checked on every pull request. The remaining half-precision suite runs nightly with
+`pixi run test-half-ratchet`; its reviewed failure list is stored in
+[`tests/half_precision_known_failures.txt`](tests/half_precision_known_failures.txt), so a new failure is visible
+without turning the known partial-support failures into a permanent PR gate. To refresh that list deliberately, run
+`pixi run test-half-baseline` and explain any additions in the pull request.
 
 See the [full precision guide](https://kornia.readthedocs.io/en/stable/get-started/precision.html) for details.
 

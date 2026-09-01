@@ -21,6 +21,18 @@ on:
         required: false
         type: string
         default: ""
+      test-path:
+        required: false
+        type: string
+        default: ""
+      half-precision-ratchet:
+        required: false
+        type: boolean
+        default: false
+      half-precision-baseline:
+        required: false
+        type: string
+        default: tests/half_precision_known_failures.txt
       optimizer:
         required: false
         type: string
@@ -124,4 +136,12 @@ jobs:
           KORNIA_TEST_RUNSLOW: ${{ inputs.runslow }}
           KORNIA_TEST_OPTIMIZER: ${{ inputs.optimizer }}
           UV_NO_SYNC: "1"
-        run: pixi run -e ${{ steps.pixi-env.outputs.name }} test ${{ inputs.pytest-extra }}
+        run: |
+          if [[ "${{ inputs.half-precision-ratchet }}" == "true" ]]; then
+            pixi run -e ${{ steps.pixi-env.outputs.name }} test-half-ratchet -- \
+              --baseline "${{ inputs.half-precision-baseline }}"
+          elif [[ -n "${{ inputs.test-path }}" ]]; then
+            pixi run -e ${{ steps.pixi-env.outputs.name }} test-module "${{ inputs.test-path }}"
+          else
+            pixi run -e ${{ steps.pixi-env.outputs.name }} test ${{ inputs.pytest-extra }}
+          fi

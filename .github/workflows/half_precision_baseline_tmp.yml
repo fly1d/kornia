@@ -1,0 +1,39 @@
+name: Temporary half-precision baseline
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@v0.10.0
+        with:
+          pixi-version: v0.40.0
+          cache: true
+          environments: py311
+
+      - name: Install dependencies
+        run: pixi run -e py311 install
+
+      - name: Install the CI PyTorch wheel
+        shell: bash
+        run: |
+          pixi run -e py311 uv run --no-sync uv pip install \
+            --reinstall-package torch --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+
+      - name: Generate the baseline
+        run: pixi run -e py311 test-half-baseline
+
+      - name: Upload the baseline
+        uses: actions/upload-artifact@v4
+        with:
+          name: half-precision-baseline
+          path: tests/half_precision_known_failures.txt
